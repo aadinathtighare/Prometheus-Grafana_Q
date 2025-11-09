@@ -1,0 +1,15 @@
+For public-facing HTTPS apps → Always prefer ACM public certs
+For internal apps or Kubernetes pod-level certs → Secrets Manager + auto-rotation Lambda can be used
+------------------------------
+Q. in acm we hv tls cert renewal option? Yes
+Q. in real time can we store ssl tls cert in AWS Secrets Manager ?
+--> For internal apps or Kubernetes pod-level certs → Secrets Manager + auto-rotation Lambda can be used
+------------------------------
+where we store tls cert ? in secret, or secret manager , hashicorp vault
+------------------------------
+Q AWS Secrets Manager what what things we can store ?
+--> RDS passwords, API keys, tokens, credentials इ.) WS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY 
+GitHub access tokens,   Private key + cert (PEM/CRT), 
+------------------
+Q. i hv secret key and access keys aws so I need to auto rotate that how 
+-------------------
