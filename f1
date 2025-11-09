@@ -1,0 +1,148 @@
+Q. Metrics Server Vs Node Exporter ?
+Q. thanos is like database for store metrics of prometheus for long term like 30 to 90 days?
+Q. create lambda function by terraform ?
+Q. Want HPA to scale pods based on CPU usage? ✅ Metrics Server
+Want alert if node disk > 90% ? ✅ Node Exporter
+-----------------------------------------------------
+Q. Where u stored metrics of Prometheus like in tsdb but how to assign storage to metrics we will create separate pod or pv pvc ?
+Q We need to install Prometheus on all servers ? --> 
+🔹 1. Prometheus Server (Central)
+
+Install Prometheus only once (or maybe 2–3 instances for HA).
+
+It pulls metrics (via HTTP) from your nodes, apps, or exporters.
+
+🔹 2. Exporters (per-node or per-service)
+
+You install exporters like:
+
+Node Exporter → on every Linux server (for CPU, memory, disk, etc.)
+
+Blackbox Exporter → for probing endpoints (ping, HTTP)
+
+Application Exporters → like MySQL exporter, Redis exporter, etc.
+
+Prometheus connects to these exporters to scrape metrics.
+
+-------------------------------------------------------------
+⚙️ Thanos काय करतो?
+1️⃣ Long-term Storage
+Thanos Prometheus चं metrics data object storage मध्ये ठेवतो:
+AWS S3
+Google Cloud Storage (GCS)
+Azure Blob
+➡️ म्हणजे तुमचं metrics data safe राहतं, even if Prometheus pod delete झालं तरी.
+--------------------------------------
+upstream and downstream in jenkins
+---------------
+how to trigger 1 pipeline by other ? in jenkins
+--> Open Pipeline A in Jenkins
+
+Click Configure → Post-build Actions → Build other projects
+
+Enter the name of Pipeline B
+
+Choose when to trigger (e.g., only if build succeeds)
+----------------------
+How to pass variable via json file , in terraform?
+----------------
+Terraform वापरून आपण Lambda function create करू शकतो — with:
+code zip file
+runtime
+handler
+IAM role
+environment variables
+-------------------------------------------
+🧩 DaemonSet vs Deployment
+DaemonSet = 1 pod per node (infra-level tools)
+Deployment = N pods per app (application-level workloads)
+----------------------------------------
+config map is updated but still pods sees old values?
+-------------
+  🧩 By default in EKS
+AWS EKS मध्ये default CNI plugin असतो —
+👉 Amazon VPC CNI
+हा CNI NetworkPolicy सपोर्ट करत नाही 😐
+म्हणून तुला Calico install करावं लागतं for NetworkPolicy support.
+===============
+🧩 What is a Network Policy in Kubernetes?
+
+By default, Kubernetes मधले सर्व pods एकमेकांशी freely communicate करू शकतात (no restrictions).
+
+म्हणजे pod-to-pod traffic वर कोणतीही security नाही 🚫
+
+👉 NetworkPolicy म्हणजे firewall rule inside the cluster.
+तू सांगू शकतोस — कोणत्या pod कडून traffic allow करायचं आणि कोणाकडून deny करायचं.
+-----------------------------------------
+Q. i want to expose my app externally so how in eks ?
+⚙️ Option 2 — Ingress Controller (Advanced / Multi-App Setup)
+
+जर तुझ्याकडे multiple microservices असतील (frontend, backend, auth, etc.),
+तर प्रत्येकासाठी LoadBalancer बनवणं costly आहे.
+त्याऐवजी Ingress + ALB Ingress Controller वापरतात.
+\Flow:
+Ingress + Ingress Controller (like ALB) + Service (ClusterIP) + Pods
+-----------------------------
+in real time prod env in k8s we are using headless service tell me use cases?
+spec:
+  clusterIP: None
+
+Normal Service मध्ये Kubernetes एक ClusterIP assign करतं,
+आणि तो एक load balancer सारखं काम करतो — म्हणजेच traffic सर्व pods मध्ये distribute होतं.
+
+पण कधी कधी आपल्याला load balancing नको असतं,
+तर pods individually discover करायचे असतात.
+तेव्हा आपण headless service वापरतो.
+Headless service म्हणजे service without ClusterIP: StatefulSets (Databases)
+------------
+i hv ec2 instance that get high cpu usage so now I want to do automation like my ai agent will login to server and checking process which is consume high cpu then kill that
+---------------------------------
+kuberenetes service type External DNS tell me use cases ?
+🧩 What is ExternalDNS in Kubernetes?
+
+🔹 ExternalDNS हे Kubernetes मधलं एक controller/tool आहे जे
+तुमच्या Kubernetes Services किंवा Ingress resources वरून DNS records automatically create करतं
+(cloud DNS provider मध्ये — जसे AWS Route53, Google Cloud DNS, Azure DNS इत्यादी).
+
+Simple words मध्ये:
+
+तुम्ही Kubernetes मध्ये app deploy केलं की ExternalDNS आपोआप त्या app साठी DNS name तयार करतो (उदा. app.mydomain.com).
+-------------------------------------------------
+🧩 What is imagePullSecret?
+
+जेव्हा आपण private container registry (जसे Docker Hub private repo, ECR, GCR, Artifactory, etc.) वापरतो,
+तेव्हा Kubernetes ला ते image pull (download) करण्यासाठी authentication लागते.
+तो authentication data आपण imagePullSecret मध्ये ठेवतो.
+==================
+🤖 Amazon SageMaker म्हणजे काय?
+
+Amazon SageMaker हा AWS चा Machine Learning (ML) service आहे.
+तो developers आणि data scientists ना machine learning models तयार करायला (build), train करायला, आणि deploy करायला मदत करतो — आणि हे सगळं without managing servers.
+-----------
+तुझ्याकडे AWS Access Key आणि Secret Access Key आहेत (for IAM user).
+But manually rotate करणं risky आणि time-consuming असतं.
+
+तू म्हणतोस → “auto rotate karaycha”
+म्हणजे जुने keys delete करून नवीन generate व्हावेत automatically.
+--------
+👉 हा easiest आणि secure मार्ग आहे.
+
+Store your AWS Access & Secret Keys in AWS Secrets Manager.
+
+Enable Automatic Rotation (Secrets Manager → Rotation tab → Enable rotation).
+
+Choose rotation lambda:
+
+तुम्ही AWS चं pre-built Lambda function वापरू शकतो,
+
+किंवा custom Lambda लिहू शकतो जो IAM मध्ये new key create करतो, जुना delete करतो.
+
+🔁 Rotation schedule: Every 30 or 60 days.
+-----------------
+🧩 Example flow:
+Lambda Function:
+- Create new access key for IAM user
+- Update secret in Secrets Manager
+- Disable and delete old key
+
+---------------
